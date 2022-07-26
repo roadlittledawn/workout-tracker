@@ -12,28 +12,7 @@
 
 Get all activity data for syncing to DB. Can use until refresh token required.
 
-## Endpoint
-
-https://www.strava.com/api/v3/athlete/activities
-
-## Params
-
-<table>
-<thead>
-<tr>
-<th>
-Param
-</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>page</td>
-<td>Paginate through results. How to know how many pages?</td>
-</tr>
-</tbody>
-</table>
+https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 
 # Example activity data
 
