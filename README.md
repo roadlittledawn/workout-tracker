@@ -6,7 +6,34 @@
 2. Approve permissions on oAuth page
 3. When redirected get `code` param
 4. Using that `code` value, send api call to: https://www.strava.com/oauth/token?client_id=ID_HERE&client_secret=SECRET_HERE&code=3a6b1dbf83fe2e84e8c7e698293599765767b9ac&grant_type=authorization_code
-5. Use the new `access_code` returned in JSON in Bearer auth header in subsequent calls
+5. Use the new `access_code` returned in JSON in Bearer auth header in subsequent resource calls (for example, `/api/v3/athlete/activities`)
+
+# Get athlete activities
+
+Get all activity data for syncing to DB. Can use until refresh token required.
+
+## Endpoint
+
+https://www.strava.com/api/v3/athlete/activities
+
+## Params
+
+<table>
+<thead>
+<tr>
+<th>
+Param
+</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>page</td>
+<td>Paginate through results. How to know how many pages?</td>
+</tr>
+</tbody>
+</table>
 
 # Example activity data
 
