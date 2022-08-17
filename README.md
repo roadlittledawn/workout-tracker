@@ -2,7 +2,8 @@
 
 # Authenticating with Strava
 
-1. Go to this page in browser: https://www.strava.com/oauth/authorize?client_id=ID_HERE&client_secret=SECRET_HERE&grant_type=authorization_code&scope=read,read_all,activity%3Aread,activity%3Aread_all&approval_prompt=force&redirect_uri=http%3A%2F%2Flocalhost%2Fexchange_token&response_type=code
+1. Go to this page in browser: https://www.strava.com/oauth/authorize?client_id=CLIENT_ID_HERE&&grant_type=authorization_code&scope=read,read_all,activity%3Aread,activity%3Aread_all&approval_prompt=force&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth-callback&response_type=code
+
 2. Approve permissions on oAuth page
 3. When redirected get `code` param
 4. Using that `code` value, send api call to: https://www.strava.com/oauth/token?client_id=ID_HERE&client_secret=SECRET_HERE&code=3a6b1dbf83fe2e84e8c7e698293599765767b9ac&grant_type=authorization_code
@@ -80,3 +81,9 @@ https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteA
 	},
   ]
 ```
+
+# Resources
+
+Using [this repo](https://github.com/alexey-dc/nextjs_express_template) as template.
+
+May use [this one](https://github.com/whoisryosuke/nextjs-oauth2-cookie-auth/tree/master/pages) too for oAuth / next.js / express
