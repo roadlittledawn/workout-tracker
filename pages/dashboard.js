@@ -28,7 +28,6 @@ const DashboardPage = () => {
   useEffect(async () => {
     console.log({ cookie: Cookies.get("seshToken") });
     if (Cookies.get("seshToken")) {
-      // TODO: figure out why i can't read cookie
       getAthleteActivities(Cookies.get("seshToken")).then((data) => {
         setActivityData(data);
       });
@@ -41,10 +40,25 @@ const DashboardPage = () => {
       {activityData && (
         <>
           <h2>Activities</h2>
-          <div>
+          <div style={{ display: "flex" }}>
             <ul>
               {activityData.map((activity) => {
                 if (activity.sport_type === "Run") {
+                  return (
+                    <>
+                      <li>{activity.name}</li>
+                      <ul>
+                        <li>{activity.start_date}</li>
+                        <li>{convertMetersToMiles(activity.distance)} miles</li>
+                      </ul>
+                    </>
+                  );
+                }
+              })}
+            </ul>
+            <ul>
+              {activityData.map((activity) => {
+                if (activity.sport_type === "Walk") {
                   return (
                     <>
                       <li>{activity.name}</li>
