@@ -87,3 +87,5 @@ https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteA
 Using [this repo](https://github.com/alexey-dc/nextjs_express_template) as template.
 
 May use [this one](https://github.com/whoisryosuke/nextjs-oauth2-cookie-auth/tree/master/pages) too for oAuth / next.js / express
+
+[Boilerplace custom server express](https://github.com/vercel/next.js/tree/canary/examples/custom-server-express) from Vercel
