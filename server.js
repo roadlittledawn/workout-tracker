@@ -55,7 +55,7 @@ app.prepare().then(() => {
         }
         res.cookie("seshToken", data.access_token, {
           maxAge: 900000,
-          httpOnly: true,
+          httpOnly: false,
         });
         return res.redirect("/dashboard");
       });
