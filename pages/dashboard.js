@@ -2,7 +2,23 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 // import withAuth from  '../utils/withAuth'
 
-const activityEndpoint = "https://www.strava.com/api/v3/athlete/activities";
+const getWeekStartAndEnd = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const day = today.getDate();
+  const monday = today.getDate() - today.getDay() + 1;
+  const sunday = today.getDate() - today.getDay() + 7;
+  const mondayDate = new Date(year, month, monday);
+  const sundayDate = new Date(year, month, sunday);
+  const startOfWeek = Math.floor(mondayDate / 1000);
+  const endOfWeek = Math.floor(sundayDate / 1000);
+  return { startOfWeek, endOfWeek };
+};
+
+const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
+
+const activityEndpoint = `https://www.strava.com/api/v3/athlete/activities?per_page=100&before=${endOfWeek}&after=${startOfWeek}`;
 
 const getAthleteActivities = async (accesToken) => {
   try {
