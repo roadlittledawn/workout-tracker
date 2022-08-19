@@ -2,6 +2,12 @@
 
 # Authenticating with Strava
 
+## Authorization callback domain
+
+Ensure the authorization callback domain used in `redirect_uri` is registered in the [Strava API app settings](https://www.strava.com/settings/api) in `Authorization Callback Domain` field. Note that `localhost` and `127.0.0.1` are [whitelisted by default](https://developers.strava.com/docs/authentication/#details-about-requesting-access).
+
+## oAuth workflow
+
 1. Go to this page in browser: https://www.strava.com/oauth/authorize?client_id=CLIENT_ID_HERE&&grant_type=authorization_code&scope=read,read_all,activity%3Aread,activity%3Aread_all&approval_prompt=force&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth-callback&response_type=code
 
 2. Approve permissions on oAuth page
