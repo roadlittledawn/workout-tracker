@@ -6,7 +6,6 @@ const getWeekStartAndEnd = () => {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
-  const day = today.getDate();
   const monday = today.getDate() - today.getDay() + 1;
   const sunday = today.getDate() - today.getDay() + 7;
   const mondayDate = new Date(year, month, monday);
