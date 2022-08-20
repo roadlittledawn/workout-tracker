@@ -1,3 +1,6 @@
+import styles from "../styles/Home.module.scss";
+import LoginButton from "../components/LoginButton";
+
 export default function Home({ NODE_ENV, HOSTNAME, PORT, CLIENT_ID }) {
   const domain =
     NODE_ENV === "production" ? `https://${HOSTNAME}.com` : `http://localhost`;
@@ -18,11 +21,13 @@ export default function Home({ NODE_ENV, HOSTNAME, PORT, CLIENT_ID }) {
   );
 
   return (
-    <ul>
-      <li>
-        <a href={href}>Login</a>
-      </li>
-    </ul>
+    <>
+      <div className={styles.login}>
+        <LoginButton href={href} size="lg">
+          Login via Strava
+        </LoginButton>
+      </div>
+    </>
   );
 }
 

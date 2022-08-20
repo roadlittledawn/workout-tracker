@@ -1,13 +1,6 @@
-.charts {
+.login {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  > * {
-    max-width: 400px;
-    text-align: center;
-  }
-}
-.activityList {
-  display: flex;
-  flex-wrap: wrap;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
