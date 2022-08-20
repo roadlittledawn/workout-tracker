@@ -11,7 +11,7 @@ const getWeekStartAndEnd = () => {
   const monday = today.getDate() - today.getDay() + 1;
   const sunday = today.getDate() - today.getDay() + 7;
   const mondayDate = new Date(year, month, monday);
-  const sundayDate = new Date(year, month, sunday);
+  const sundayDate = new Date(year, month, sunday, 17, 0, 0);
   const startOfWeek = Math.floor(mondayDate / 1000);
   const endOfWeek = Math.floor(sundayDate / 1000);
   return { startOfWeek, endOfWeek };
