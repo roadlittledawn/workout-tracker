@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import LoginButton from "../components/LoginButton";
 import { CircularProgressbar } from "react-circular-progressbar";
-import styles from "../styles/Home.module.scss";
+import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
 
 const getWeekStartAndEnd = () => {
