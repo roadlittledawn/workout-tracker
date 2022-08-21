@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import LoginButton from "../components/LoginButton";
+import moment from "moment";
 import { CircularProgressbar } from "react-circular-progressbar";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
 
 const getWeekStartAndEnd = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const monday = today.getDate() - today.getDay() + 1;
-  const sunday = today.getDate() - today.getDay() + 7;
-  const mondayDate = new Date(year, month, monday);
-  const sundayDate = new Date(year, month, sunday, 17, 0, 0);
+  const mondayDate = new Date(moment().startOf("isoWeek"));
+  const sundayDate = new Date(moment().endOf("isoWeek"));
+
   const startOfWeek = Math.floor(mondayDate / 1000);
   const endOfWeek = Math.floor(sundayDate / 1000);
   return { startOfWeek, endOfWeek };
