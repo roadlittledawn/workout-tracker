@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import moment from "moment";
 import { CircularProgressbar } from "react-circular-progressbar";
+import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
 
@@ -41,7 +42,8 @@ const convertMetersToMiles = (meters) => {
   return (meters / 1609).toFixed(2);
 };
 
-const DashboardPage = () => {
+const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
+  const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
   const [activityData, setActivityData] = useState([]);
   const [milesRan, setMilesRan] = useState(0);
   const [milesRanGoalPercent, setMilesRanGoalPercent] = useState(0);
@@ -87,6 +89,13 @@ const DashboardPage = () => {
 
   return (
     <>
+      <header className={styles.header}>
+        <div>
+          <LoginButton envVars={envVars} size="default">
+            Login via Strava
+          </LoginButton>
+        </div>
+      </header>
       <h1>Dashboard</h1>
       {activityData && (
         <>
@@ -152,5 +161,12 @@ const DashboardPage = () => {
   );
 };
 
+export const getServerSideProps = () => {
+  const NODE_ENV = process.env.NODE_ENV;
+  const HOSTNAME = process.env.HOSTNAME;
+  const CLIENT_ID = process.env.CLIENT_ID;
+
+  return { props: { NODE_ENV, HOSTNAME, CLIENT_ID } };
+};
+
 export default DashboardPage;
-// export default withAuth((Dashboard));
