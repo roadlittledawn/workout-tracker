@@ -22,7 +22,7 @@ const WEEKLY_GOALS = {
 
 const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
 
-const activityEndpoint = `https://www.strava.com/api/v3/athlete/activities?per_page=100&before=${endOfWeek}&after=${startOfWeek}`;
+const activityEndpoint = `https://www.strava.com/api/v3/athlete/activities?per_page=100&after=${startOfWeek}&before=${endOfWeek}`;
 
 const getAthleteActivities = async (accesToken) => {
   try {
@@ -99,7 +99,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       <h1>Dashboard</h1>
       {activityData && (
         <>
-          <h2>Weekly Goals</h2>
+          <h2>Weekly goal progress</h2>
           <div className={styles.charts}>
             <div>
               <h3>Run</h3>
@@ -110,6 +110,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               <p>
                 {milesRan} miles of {WEEKLY_GOALS["Run"]} mile goal
               </p>
+              <p>{WEEKLY_GOALS["Run"] - milesRan} miles left!</p>
             </div>
             <div>
               <h3>Walk</h3>
@@ -120,18 +121,30 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               <p>
                 {milesWalked} miles of {WEEKLY_GOALS["Walk"]} mile goal
               </p>
+              <p>{WEEKLY_GOALS["Walk"] - milesWalked} miles left!</p>
             </div>
           </div>
-          <h2>Activities</h2>
+          <h2>Weekly log</h2>
           <div className={styles.activityList}>
             <ul>
               {activityData.map((activity) => {
                 if (activity.sport_type === "Run") {
                   return (
                     <>
-                      <li>{activity.name}</li>
+                      <li>
+                        <a
+                          href={`https://www.strava.com/activities/${activity.id}`}
+                          target="_blank"
+                        >
+                          {activity.name}
+                        </a>
+                      </li>
                       <ul>
-                        <li>{activity.start_date}</li>
+                        <li>
+                          {moment(activity.start_date).format(
+                            "ddd, MMM D [@] HH:mm zz"
+                          )}
+                        </li>
                         <li>{convertMetersToMiles(activity.distance)} miles</li>
                       </ul>
                     </>
@@ -144,9 +157,21 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                 if (activity.sport_type === "Walk") {
                   return (
                     <>
-                      <li>{activity.name}</li>
+                      <li>
+                        {" "}
+                        <a
+                          href={`https://www.strava.com/activities/${activity.id}`}
+                          target="_blank"
+                        >
+                          {activity.name}
+                        </a>
+                      </li>
                       <ul>
-                        <li>{activity.start_date}</li>
+                        <li>
+                          {moment(activity.start_date).format(
+                            "ddd, MMM D [@] HH:mm zz"
+                          )}
+                        </li>
                         <li>{convertMetersToMiles(activity.distance)} miles</li>
                       </ul>
                     </>
