@@ -42,6 +42,9 @@ const convertMetersToMiles = (meters) => {
   return (meters / 1609).toFixed(2);
 };
 
+const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
+  (number1 - number2).toFixed(digitsAfterDecimal);
+
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
   const [activityData, setActivityData] = useState([]);
@@ -110,7 +113,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               <p>
                 {milesRan} miles of {WEEKLY_GOALS["Run"]} mile goal
               </p>
-              <p>{WEEKLY_GOALS["Run"] - milesRan} miles left!</p>
+              <p>
+                {calcDistanceDifference(WEEKLY_GOALS["Run"], milesRan)} miles
+                left!
+              </p>
             </div>
             <div>
               <h3>Walk</h3>
@@ -121,7 +127,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               <p>
                 {milesWalked} miles of {WEEKLY_GOALS["Walk"]} mile goal
               </p>
-              <p>{WEEKLY_GOALS["Walk"] - milesWalked} miles left!</p>
+              <p>
+                {calcDistanceDifference(WEEKLY_GOALS["Walk"], milesWalked)}{" "}
+                miles left!
+              </p>
             </div>
           </div>
           <h2>Weekly log</h2>
