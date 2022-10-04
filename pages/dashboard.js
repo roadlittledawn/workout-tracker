@@ -5,6 +5,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
+import getActivityData from "../utils/getActivityData";
 
 const getWeekStartAndEnd = () => {
   const mondayDate = new Date(moment().startOf("isoWeek"));
@@ -48,16 +49,27 @@ const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
   const [activityData, setActivityData] = useState([]);
+  const [previousActivityData, setPreviousActivityData] = useState([]);
   const [milesRan, setMilesRan] = useState(0);
   const [milesRanGoalPercent, setMilesRanGoalPercent] = useState(0);
   const [milesWalked, setMilesWalked] = useState(0);
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
 
   useEffect(async () => {
-    if (Cookies.get("seshToken")) {
-      getAthleteActivities(Cookies.get("seshToken")).then((data) => {
-        setActivityData(data);
-      });
+    for (let a = 1; a <= 6; a++) {
+      if (Cookies.get("seshToken")) {
+        const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
+        const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
+        const accessToken = Cookies.get("seshToken");
+        const data = getActivityData({ accessToken, start, end });
+        data.then((res) =>
+          setPreviousActivityData((prevState) => [...prevState, res])
+        );
+
+        getAthleteActivities(Cookies.get("seshToken")).then((data) => {
+          setActivityData(data);
+        });
+      }
     }
   }, []);
 
