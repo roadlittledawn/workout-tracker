@@ -2,6 +2,17 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import moment from "moment";
 import { CircularProgressbar } from "react-circular-progressbar";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
@@ -40,7 +51,7 @@ const getAthleteActivities = async (accesToken) => {
 };
 
 const convertMetersToMiles = (meters) => {
-  return (meters / 1609).toFixed(2);
+  return Number((meters / 1609).toFixed(2));
 };
 
 const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
@@ -55,6 +66,52 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [milesWalked, setMilesWalked] = useState(0);
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
 
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Chart.js Line Chart",
+      },
+    },
+  };
+
+  const labels = [
+    "6 weeks ago",
+    "5 weeks ago",
+    "4 weeks ago",
+    "3 weeks ago",
+    "2 weeks ago",
+    "Last week",
+  ];
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Miles Ran",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalMilesRan }) => totalMilesRan),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
+
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
       for (let a = 1; a <= 6; a++) {
@@ -62,12 +119,36 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
         const accessToken = Cookies.get("seshToken");
         const data = getActivityData({ accessToken, start, end });
-        data.then((res) =>
+        data.then((res) => {
+          const totalMilesRan = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Run") {
+                return Number(
+                  (accum + convertMetersToMiles(distance)).toFixed(2)
+                );
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
+          const totalMilesWalked = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Walk") {
+                return Number(
+                  (accum + convertMetersToMiles(distance)).toFixed(2)
+                );
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
           setPreviousActivityData((prevState) => [
             ...prevState,
-            { order: a, activities: res },
-          ])
-        );
+            { order: a, totalMilesRan, totalMilesWalked, activities: res },
+          ]);
+        });
       }
 
       getAthleteActivities(Cookies.get("seshToken")).then((data) => {
@@ -101,9 +182,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       const percentProgress = Math.ceil(
         (milesWalked / WEEKLY_GOALS["Walk"]) * 100
       );
+      console.log({ percentProgress });
       setMilesWalkedGoalPercent(percentProgress);
     }
-  }, [milesRan]);
+  }, [milesRan, milesWalked]);
 
   return (
     <>
@@ -207,7 +289,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
           <h1>Previous weeks</h1>
           <div className={styles.activityList}>
             {previousActivityData
-              .sort((a, b) => a.order - b.order)
+              .sort((a, b) => a.order < b.order)
               .map((week, idx) => (
                 <>
                   <h3>Week {idx}</h3>
@@ -242,6 +324,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                 </>
               ))}
           </div>
+          <h1>Previous week chart</h1>
+          <Line options={options} data={chartData} />
         </>
       )}
     </>

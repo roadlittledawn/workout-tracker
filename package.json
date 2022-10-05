@@ -21,6 +21,7 @@
   "homepage": "https://github.com/roadlittledawn/workout-tracker#readme",
   "dependencies": {
     "body-parser": "^1.20.0",
+    "chart.js": "^3.9.1",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.1",
@@ -30,6 +31,7 @@
     "next": "^12.2.5",
     "node-fetch": "2",
     "react": "^17.0.2",
+    "react-chartjs-2": "^4.3.1",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^17.0.2"
   },
