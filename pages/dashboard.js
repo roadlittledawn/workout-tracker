@@ -84,7 +84,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       },
       title: {
         display: true,
-        text: "Chart.js Line Chart",
+        text: "Total miles per week per activity",
       },
     },
   };
@@ -108,6 +108,26 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
           .map(({ totalMilesRan }) => totalMilesRan),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+      {
+        label: "Miles Walked",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalMilesWalked }) => totalMilesWalked),
+        borderColor: "rgb(24, 113, 69)",
+        backgroundColor: "rgba(24, 158, 69, 0.5)",
+      },
+      {
+        label: "Running Goal",
+        data: labels.map(() => WEEKLY_GOALS["Run"]),
+        borderColor: "rgb(0, 6, 12,)",
+        backgroundColor: "rgba(0, 6, 12, 0.25)",
+      },
+      {
+        label: "Walking Goal",
+        data: labels.map(() => WEEKLY_GOALS["Walk"]),
+        borderColor: "rgb(0, 6, 12,)",
+        backgroundColor: "rgba(0, 6, 12, 0.25)",
       },
     ],
   };
