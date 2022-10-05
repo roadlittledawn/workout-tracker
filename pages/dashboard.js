@@ -56,20 +56,23 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
 
   useEffect(async () => {
-    for (let a = 1; a <= 6; a++) {
-      if (Cookies.get("seshToken")) {
+    if (Cookies.get("seshToken")) {
+      for (let a = 1; a <= 6; a++) {
         const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
         const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
         const accessToken = Cookies.get("seshToken");
         const data = getActivityData({ accessToken, start, end });
         data.then((res) =>
-          setPreviousActivityData((prevState) => [...prevState, res])
+          setPreviousActivityData((prevState) => [
+            ...prevState,
+            { order: a, activities: res },
+          ])
         );
-
-        getAthleteActivities(Cookies.get("seshToken")).then((data) => {
-          setActivityData(data);
-        });
       }
+
+      getAthleteActivities(Cookies.get("seshToken")).then((data) => {
+        setActivityData(data);
+      });
     }
   }, []);
 
@@ -200,6 +203,44 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                 }
               })}
             </ul>
+          </div>
+          <h1>Previous weeks</h1>
+          <div className={styles.activityList}>
+            {previousActivityData
+              .sort((a, b) => a.order - b.order)
+              .map((week, idx) => (
+                <>
+                  <h3>Week {idx}</h3>
+                  <ul>
+                    {week.activities.map((activity) => {
+                      if (["Run", "Walk"].includes(activity.sport_type)) {
+                        return (
+                          <>
+                            <li>
+                              <a
+                                href={`https://www.strava.com/activities/${activity.id}`}
+                                target="_blank"
+                              >
+                                {activity.name}
+                              </a>
+                            </li>
+                            <ul>
+                              <li>
+                                {moment(activity.start_date).format(
+                                  "ddd, MMM D [@] HH:mm zz"
+                                )}
+                              </li>
+                              <li>
+                                {convertMetersToMiles(activity.distance)} miles
+                              </li>
+                            </ul>
+                          </>
+                        );
+                      }
+                    })}
+                  </ul>
+                </>
+              ))}
           </div>
         </>
       )}
