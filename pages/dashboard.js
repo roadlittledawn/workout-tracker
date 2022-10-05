@@ -306,50 +306,13 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               })}
             </ul>
           </div>
-          <h1>Previous weeks</h1>
-          <div className={styles.activityList}>
-            {previousActivityData
-              .sort((a, b) => a.order < b.order)
-              .map((week, idx) => (
-                <>
-                  <h3>Week {idx}</h3>
-                  <ul>
-                    {week.activities.map((activity) => {
-                      if (["Run", "Walk"].includes(activity.sport_type)) {
-                        return (
-                          <>
-                            <li>
-                              <a
-                                href={`https://www.strava.com/activities/${activity.id}`}
-                                target="_blank"
-                              >
-                                {activity.name}
-                              </a>
-                            </li>
-                            <ul>
-                              <li>
-                                {moment(activity.start_date).format(
-                                  "ddd, MMM D [@] HH:mm zz"
-                                )}
-                              </li>
-                              <li>
-                                {convertMetersToMiles(activity.distance)} miles
-                              </li>
-                            </ul>
-                          </>
-                        );
-                      }
-                    })}
-                  </ul>
-                </>
-              ))}
-          </div>
-          <h1>Previous week chart</h1>
-          <div className={styles.chartsLineChart}>
-            <Line options={options} data={chartData} />
-          </div>
         </>
       )}
+
+      <h1>Previous week chart</h1>
+      <div className={styles.chartsLineChart}>
+        <Line options={options} data={chartData} />
+      </div>
     </>
   );
 };
