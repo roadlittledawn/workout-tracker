@@ -2,9 +2,21 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import moment from "moment";
 import { CircularProgressbar } from "react-circular-progressbar";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
+import getActivityData from "../utils/getActivityData";
 
 const getWeekStartAndEnd = () => {
   const mondayDate = new Date(moment().startOf("isoWeek"));
@@ -39,7 +51,7 @@ const getAthleteActivities = async (accesToken) => {
 };
 
 const convertMetersToMiles = (meters) => {
-  return (meters / 1609).toFixed(2);
+  return Number((meters / 1609).toFixed(2));
 };
 
 const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
@@ -48,13 +60,117 @@ const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
   const [activityData, setActivityData] = useState([]);
+  const [previousActivityData, setPreviousActivityData] = useState([]);
   const [milesRan, setMilesRan] = useState(0);
   const [milesRanGoalPercent, setMilesRanGoalPercent] = useState(0);
   const [milesWalked, setMilesWalked] = useState(0);
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
 
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Total miles per week per activity",
+      },
+    },
+  };
+
+  const labels = [
+    "6 weeks ago",
+    "5 weeks ago",
+    "4 weeks ago",
+    "3 weeks ago",
+    "2 weeks ago",
+    "Last week",
+  ];
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Miles Ran",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalMilesRan }) => totalMilesRan),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+      {
+        label: "Miles Walked",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalMilesWalked }) => totalMilesWalked),
+        borderColor: "rgb(24, 113, 69)",
+        backgroundColor: "rgba(24, 158, 69, 0.5)",
+      },
+      {
+        label: "Running Goal",
+        data: labels.map(() => WEEKLY_GOALS["Run"]),
+        borderColor: "rgba(0, 0, 0, 0.25)",
+        backgroundColor: "rgba(0, 6, 12, 0.25)",
+      },
+      {
+        label: "Walking Goal",
+        data: labels.map(() => WEEKLY_GOALS["Walk"]),
+        borderColor: "rgba(0, 0, 0, 0.25)",
+        backgroundColor: "rgba(0, 6, 12, 0.25)",
+      },
+    ],
+  };
+
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
+      for (let a = 1; a <= 6; a++) {
+        const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
+        const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
+        const accessToken = Cookies.get("seshToken");
+        const data = getActivityData({ accessToken, start, end });
+        data.then((res) => {
+          const totalMilesRan = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Run") {
+                return Number(
+                  (accum + convertMetersToMiles(distance)).toFixed(2)
+                );
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
+          const totalMilesWalked = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Walk") {
+                return Number(
+                  (accum + convertMetersToMiles(distance)).toFixed(2)
+                );
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
+          setPreviousActivityData((prevState) => [
+            ...prevState,
+            { order: a, totalMilesRan, totalMilesWalked, activities: res },
+          ]);
+        });
+      }
+
       getAthleteActivities(Cookies.get("seshToken")).then((data) => {
         setActivityData(data);
       });
@@ -86,9 +202,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       const percentProgress = Math.ceil(
         (milesWalked / WEEKLY_GOALS["Walk"]) * 100
       );
+      console.log({ percentProgress });
       setMilesWalkedGoalPercent(percentProgress);
     }
-  }, [milesRan]);
+  }, [milesRan, milesWalked]);
 
   return (
     <>
@@ -191,6 +308,11 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
           </div>
         </>
       )}
+
+      <h1>Previous week chart</h1>
+      <div className={styles.chartsLineChart}>
+        <Line options={options} data={chartData} />
+      </div>
     </>
   );
 };
