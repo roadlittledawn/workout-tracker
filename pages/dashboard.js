@@ -120,13 +120,13 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       {
         label: "Running Goal",
         data: labels.map(() => WEEKLY_GOALS["Run"]),
-        borderColor: "rgb(0, 6, 12,)",
+        borderColor: "rgba(0, 0, 0, 0.25)",
         backgroundColor: "rgba(0, 6, 12, 0.25)",
       },
       {
         label: "Walking Goal",
         data: labels.map(() => WEEKLY_GOALS["Walk"]),
-        borderColor: "rgb(0, 6, 12,)",
+        borderColor: "rgba(0, 0, 0, 0.25)",
         backgroundColor: "rgba(0, 6, 12, 0.25)",
       },
     ],
@@ -345,7 +345,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               ))}
           </div>
           <h1>Previous week chart</h1>
-          <Line options={options} data={chartData} />
+          <div className={styles.chartsLineChart}>
+            <Line options={options} data={chartData} />
+          </div>
         </>
       )}
     </>
