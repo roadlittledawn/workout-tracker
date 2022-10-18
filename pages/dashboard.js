@@ -30,6 +30,7 @@ const getWeekStartAndEnd = () => {
 const WEEKLY_GOALS = {
   ["Run"]: 10,
   ["Walk"]: 10,
+  ["Workout"]: 1,
 };
 
 const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
@@ -65,6 +66,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [milesRanGoalPercent, setMilesRanGoalPercent] = useState(0);
   const [milesWalked, setMilesWalked] = useState(0);
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
+  const [totalWorkouts, setTotalWorkouts] = useState(0);
+  const [totalWorkoutsPercent, setTotalWorkoutsPercent] = useState(0);
 
   ChartJS.register(
     CategoryScale,
@@ -84,7 +87,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       },
       title: {
         display: true,
-        text: "Total miles per week per activity",
+        text: "Goal progress per week per activity",
       },
     },
   };
@@ -118,6 +121,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         backgroundColor: "rgba(24, 158, 69, 0.5)",
       },
       {
+        label: "Total Workouts",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalWorkouts }) => totalWorkouts),
+        borderColor: "rgb(24, 113, 69)",
+        backgroundColor: "rgba(24, 158, 69, 0.5)",
+      },
+      {
         label: "Running Goal",
         data: labels.map(() => WEEKLY_GOALS["Run"]),
         borderColor: "rgba(0, 0, 0, 0.25)",
@@ -126,6 +137,12 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       {
         label: "Walking Goal",
         data: labels.map(() => WEEKLY_GOALS["Walk"]),
+        borderColor: "rgba(0, 0, 0, 0.25)",
+        backgroundColor: "rgba(0, 6, 12, 0.25)",
+      },
+      {
+        label: "Workout Goal",
+        data: labels.map(() => WEEKLY_GOALS["Workout"]),
         borderColor: "rgba(0, 0, 0, 0.25)",
         backgroundColor: "rgba(0, 6, 12, 0.25)",
       },
@@ -164,9 +181,23 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             },
             0
           );
+          const totalWorkouts = res.reduce((accum, { sport_type }) => {
+            if (sport_type === "Workout") {
+              return accum + 1;
+            } else {
+              return accum;
+            }
+          }, 0);
+
           setPreviousActivityData((prevState) => [
             ...prevState,
-            { order: a, totalMilesRan, totalMilesWalked, activities: res },
+            {
+              order: a,
+              totalMilesRan,
+              totalMilesWalked,
+              totalWorkouts,
+              activities: res,
+            },
           ]);
         });
       }
@@ -190,6 +221,12 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         .reduce((prev, curr) => prev + curr.distance, 0);
 
       setMilesWalked(convertMetersToMiles(totalMetersWalked));
+
+      const totalWorkouts = activityData.filter(
+        ({ sport_type }) => sport_type === "Workout"
+      ).length;
+
+      setTotalWorkouts(totalWorkouts);
     }
   }, [activityData]);
 
@@ -202,10 +239,13 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       const percentProgress = Math.ceil(
         (milesWalked / WEEKLY_GOALS["Walk"]) * 100
       );
-      console.log({ percentProgress });
       setMilesWalkedGoalPercent(percentProgress);
     }
-  }, [milesRan, milesWalked]);
+    const totalWorkoutsPercent = Math.ceil(
+      (totalWorkouts / WEEKLY_GOALS["Workout"]) * 100
+    );
+    setTotalWorkoutsPercent(totalWorkoutsPercent);
+  }, [milesRan, milesWalked, totalWorkouts]);
 
   return (
     <>
@@ -247,6 +287,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               <p>
                 {calcDistanceDifference(WEEKLY_GOALS["Walk"], milesWalked)}{" "}
                 miles left!
+              </p>
+            </div>
+            <div>
+              <h3>Workouts</h3>
+              <CircularProgressbar
+                value={totalWorkoutsPercent}
+                text={`${totalWorkoutsPercent}%`}
+              />
+              <p>
+                {totalWorkouts} workouts of your {WEEKLY_GOALS["Workout"]}{" "}
+                workout goal
               </p>
             </div>
           </div>
@@ -299,6 +350,31 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                           )}
                         </li>
                         <li>{convertMetersToMiles(activity.distance)} miles</li>
+                      </ul>
+                    </>
+                  );
+                }
+              })}
+            </ul>
+            <ul>
+              {activityData.map((activity) => {
+                if (activity.sport_type === "Workout") {
+                  return (
+                    <>
+                      <li>
+                        <a
+                          href={`https://www.strava.com/activities/${activity.id}`}
+                          target="_blank"
+                        >
+                          {activity.name}
+                        </a>
+                      </li>
+                      <ul>
+                        <li>
+                          {moment(activity.start_date).format(
+                            "ddd, MMM D [@] HH:mm zz"
+                          )}
+                        </li>
                       </ul>
                     </>
                   );
