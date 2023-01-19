@@ -1,6 +1,7 @@
 [
   {
     "sportType": "Run",
+    "displayName": "Hal Hidgen Half Marathon Training",
     "startDate": "2023-1-9",
     "endDate": "2023-4-16",
     "goalVariesByWeek": true,
