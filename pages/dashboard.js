@@ -23,6 +23,8 @@ import {
   convertMetersToMiles,
   calcDistanceDifference,
 } from "../utils";
+import goals from "../data/goals.json";
+import Calendar from "../components/Calendar";
 
 const WEEKLY_GOALS = {
   ["Run"]: 10,
@@ -42,6 +44,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [milesWalkedGoalPercent, setMilesWalkedGoalPercent] = useState(0);
   const [totalWorkouts, setTotalWorkouts] = useState(0);
   const [totalWorkoutsPercent, setTotalWorkoutsPercent] = useState(0);
+  const [allGoals, setAllGoals] = useState(goals);
 
   ChartJS.register(
     CategoryScale,
@@ -235,6 +238,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         </div>
       </header>
       <h1>Dashboard</h1>
+      <>
+        <Calendar startDate={"2023-1-9"} endDate={"2023-4-16"} />
+      </>
       {activityData && (
         <>
           <h2>Weekly goal progress</h2>
