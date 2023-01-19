@@ -16,16 +16,13 @@ import {
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
 import "react-circular-progressbar/dist/styles.css";
-import getActivityData from "../utils/getActivityData";
-
-const getWeekStartAndEnd = () => {
-  const mondayDate = new Date(moment().startOf("isoWeek"));
-  const sundayDate = new Date(moment().endOf("isoWeek"));
-
-  const startOfWeek = Math.floor(mondayDate / 1000);
-  const endOfWeek = Math.floor(sundayDate / 1000);
-  return { startOfWeek, endOfWeek };
-};
+import {
+  getActivityData,
+  getAthleteActivities,
+  getWeekStartAndEnd,
+  convertMetersToMiles,
+  calcDistanceDifference,
+} from "../utils";
 
 const WEEKLY_GOALS = {
   ["Run"]: 10,
@@ -34,29 +31,6 @@ const WEEKLY_GOALS = {
 };
 
 const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
-
-const activityEndpoint = `https://www.strava.com/api/v3/athlete/activities?per_page=100&after=${startOfWeek}&before=${endOfWeek}`;
-
-const getAthleteActivities = async (accesToken) => {
-  try {
-    const response = await fetch(activityEndpoint, {
-      headers: {
-        Authorization: "Bearer " + accesToken,
-      },
-    });
-
-    return response.json();
-  } catch (error) {
-    console.log("Error retrieving data: ", error);
-  }
-};
-
-const convertMetersToMiles = (meters) => {
-  return Number((meters / 1609).toFixed(2));
-};
-
-const calcDistanceDifference = (number1, number2, digitsAfterDecimal = 2) =>
-  (number1 - number2).toFixed(digitsAfterDecimal);
 
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
@@ -151,10 +125,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
 
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
+      const accessToken = Cookies.get("seshToken");
       for (let a = 1; a <= 6; a++) {
         const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
         const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
-        const accessToken = Cookies.get("seshToken");
         const data = getActivityData({ accessToken, start, end });
         data.then((res) => {
           const totalMilesRan = res.reduce(
@@ -202,7 +176,11 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         });
       }
 
-      getAthleteActivities(Cookies.get("seshToken")).then((data) => {
+      getAthleteActivities({
+        accessToken,
+        start: startOfWeek,
+        end: endOfWeek,
+      }).then((data) => {
         setActivityData(data);
       });
     }
