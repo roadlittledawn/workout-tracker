@@ -22,9 +22,10 @@ import {
   getWeekStartAndEnd,
   convertMetersToMiles,
   calcDistanceDifference,
+  getStartOfWeekDateStamp,
 } from "../utils";
 import goals from "../data/goals.json";
-import Calendar from "../components/Calendar";
+// import Calendar from "../components/Calendar";
 
 const WEEKLY_GOALS = {
   ["Run"]: 10,
@@ -213,7 +214,19 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
 
   useEffect(() => {
     if (milesRan) {
-      const percentProgress = Math.ceil((milesRan / WEEKLY_GOALS["Run"]) * 100);
+      const totalMilesRanGoal = goals.reduce((accum, curr) => {
+        if (curr.goalId === "total-miles-ran" && curr.goalVariesByWeek) {
+          const dateKey = getStartOfWeekDateStamp(startOfWeek, "YYYY-M-D");
+          const thisWeeksGoal = curr.goalsByWeek.find(
+            (item) => Object.keys(item)[0] === dateKey
+          )[dateKey];
+          return accum + thisWeeksGoal;
+        } else {
+          return accum + 0;
+        }
+      }, 0);
+
+      const percentProgress = Math.ceil((milesRan / totalMilesRanGoal) * 100);
       setMilesRanGoalPercent(percentProgress);
     }
     if (milesWalked) {
@@ -238,9 +251,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         </div>
       </header>
       <h1>Dashboard</h1>
-      <>
+      {/* <>
         <Calendar startDate={"2023-1-9"} endDate={"2023-4-16"} />
-      </>
+      </> */}
       {activityData && (
         <>
           <h2>Weekly goal progress</h2>

@@ -6,7 +6,7 @@
 import moment from "moment";
 
 const Calendar = ({ startDate, endDate }) => {
-  console.log({ month: moment().month(startDate).format("M") });
+  // console.log({ month: moment().month(startDate).format("M") });
 
   const numberOfMonths = null;
 
@@ -20,7 +20,7 @@ const Calendar = ({ startDate, endDate }) => {
     },
   ];
 
-  console.log({ months });
+  // console.log({ months });
 
   return <>Calender here</>;
 };

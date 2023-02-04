@@ -8,3 +8,7 @@ export const getWeekStartAndEnd = () => {
   const endOfWeek = Math.floor(sundayDate / 1000);
   return { startOfWeek, endOfWeek };
 };
+
+export const getStartOfWeekDateStamp = (startOfWeekUnix, formatString) => {
+  return moment(startOfWeekUnix * 1000).format(formatString);
+};
