@@ -108,7 +108,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       },
       {
         label: "Running Goal",
-        data: labels.map(() => WEEKLY_GOALS["Run"]),
+        data: goals.reduce((accum, curr) => {
+          if (curr.goalId === "total-miles-ran" && curr.goalVariesByWeek) {
+            const dateKey = getStartOfWeekDateStamp(startOfWeek, "YYYY-M-D");
+            const thisWeeksGoal = curr.goalsByWeek.find(
+              (item) => Object.keys(item)[0] === dateKey
+            )[dateKey];
+            return accum + thisWeeksGoal;
+          } else {
+            return accum + 0;
+          }
+        }, 0),
         borderColor: "rgba(0, 0, 0, 0.25)",
         backgroundColor: "rgba(0, 6, 12, 0.25)",
       },

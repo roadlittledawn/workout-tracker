@@ -39,3 +39,7 @@ export const getAthleteActivities = async ({
     console.log("Error retrieving data: ", error);
   }
 };
+
+export const getThisWeeksGoal = (goalsByWeek, dateKey) => {
+  return goalsByWeek.find((item) => Object.keys(item)[0] === dateKey)[dateKey];
+};
