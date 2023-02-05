@@ -28,6 +28,7 @@
   },
   {
     "sportType": "Walk",
+    "goalId": "total-miles-walked",
     "startDate": "2023-1-9",
     "endDate": "2023-4-16",
     "goalVariesByWeek": false,
