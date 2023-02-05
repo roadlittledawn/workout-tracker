@@ -1,0 +1,37 @@
+[
+  {
+    "sportType": "Run",
+    "goalId": "total-miles-ran",
+    "displayName": "Hal Hidgen Half Marathon Training",
+    "startDate": "2023-1-9",
+    "endDate": "2023-4-16",
+    "targetMetricName": "Total Miles Ran",
+    "targetMetrickKey": "distance",
+    "targetMetricNumber": null,
+    "goalVariesByWeek": true,
+    "goalsByWeek": [
+      { "2023-1-9": 10 },
+      { "2023-1-16": 10 },
+      { "2023-1-23": 10 },
+      { "2023-1-30": 10 },
+      { "2023-2-6": 12 },
+      { "2023-2-13": 12 },
+      { "2023-2-20": 14 },
+      { "2023-2-27": 11 },
+      { "2023-3-6": 16 },
+      { "2023-3-13": 17 },
+      { "2023-3-20": 16 },
+      { "2023-3-27": 19 },
+      { "2023-4-3": 20 },
+      { "2023-4-10": 19 }
+    ]
+  },
+  {
+    "sportType": "Walk",
+    "goalId": "total-miles-walked",
+    "startDate": "2023-1-9",
+    "endDate": "2023-4-16",
+    "goalVariesByWeek": false,
+    "distance": 10
+  }
+]
