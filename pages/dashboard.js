@@ -19,7 +19,8 @@ import "react-circular-progressbar/dist/styles.css";
 import {
   getActivityData,
   getAthleteActivities,
-  getWeekStartAndEnd,
+  getThisWeekStartAndEnd,
+  getWeekStartAndEndDates,
   convertMetersToMiles,
   calcDistanceDifference,
   getStartOfWeekDateStamp,
@@ -31,7 +32,7 @@ const WEEKLY_GOALS = {
   ["Walk"]: 10,
 };
 
-const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
+const { startOfWeek, endOfWeek } = getThisWeekStartAndEnd();
 
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
@@ -67,15 +68,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     },
   };
 
-  const labels = [
-    "6 weeks ago",
-    "5 weeks ago",
-    "4 weeks ago",
-    "3 weeks ago",
-    "2 weeks ago",
-    "Last week",
-    "This week",
-  ];
+  const labels = getWeekStartAndEndDates(6, "M-D").map(
+    ({ start, end }) => `${start} to ${end}`
+  );
 
   const chartData = {
     labels,
