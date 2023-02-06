@@ -76,6 +76,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     "3 weeks ago",
     "2 weeks ago",
     "Last week",
+    "This week",
   ];
 
   const chartData = {
@@ -99,11 +100,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       },
       {
         label: "Running Goal",
-        // data: [2, 4, 6, 8, 10, 12],
         data: getPastWeeksGoal(
           allGoals.find(({ goalId }) => goalId === "total-miles-ran"),
           getStartOfWeekDateStamp(startOfWeek, "YYYY-M-D"),
-          6
+          7
         ),
         borderColor: "#c700392e",
         backgroundColor: "#c700392e",
@@ -120,7 +120,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
       const accessToken = Cookies.get("seshToken");
-      for (let a = 1; a <= 6; a++) {
+      for (let a = 0; a <= 6; a++) {
         const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
         const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
         const data = getActivityData({ accessToken, start, end });
