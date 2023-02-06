@@ -19,21 +19,20 @@ import "react-circular-progressbar/dist/styles.css";
 import {
   getActivityData,
   getAthleteActivities,
-  getWeekStartAndEnd,
+  getThisWeekStartAndEnd,
+  getWeekStartAndEndDates,
   convertMetersToMiles,
   calcDistanceDifference,
   getStartOfWeekDateStamp,
   getPastWeeksGoal,
 } from "../utils";
 import goals from "../data/goals.json";
-// import Calendar from "../components/Calendar";
 
 const WEEKLY_GOALS = {
-  ["Run"]: 10,
   ["Walk"]: 10,
 };
 
-const { startOfWeek, endOfWeek } = getWeekStartAndEnd();
+const { startOfWeek, endOfWeek } = getThisWeekStartAndEnd();
 
 const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const envVars = { NODE_ENV, HOSTNAME, CLIENT_ID };
@@ -69,14 +68,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     },
   };
 
-  const labels = [
-    "6 weeks ago",
-    "5 weeks ago",
-    "4 weeks ago",
-    "3 weeks ago",
-    "2 weeks ago",
-    "Last week",
-  ];
+  const labels = getWeekStartAndEndDates(6, "M-D").map(
+    ({ start, end }) => `${start} to ${end}`
+  );
 
   const chartData = {
     labels,
@@ -99,11 +93,10 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       },
       {
         label: "Running Goal",
-        // data: [2, 4, 6, 8, 10, 12],
         data: getPastWeeksGoal(
           allGoals.find(({ goalId }) => goalId === "total-miles-ran"),
           getStartOfWeekDateStamp(startOfWeek, "YYYY-M-D"),
-          6
+          7
         ),
         borderColor: "#c700392e",
         backgroundColor: "#c700392e",
@@ -120,7 +113,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
       const accessToken = Cookies.get("seshToken");
-      for (let a = 1; a <= 6; a++) {
+      for (let a = 0; a <= 6; a++) {
         const start = moment().subtract(a, "weeks").startOf("isoWeek").unix();
         const end = moment().subtract(a, "weeks").endOf("isoWeek").unix();
         const data = getActivityData({ accessToken, start, end });
