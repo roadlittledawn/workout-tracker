@@ -26,10 +26,8 @@ import {
   getPastWeeksGoal,
 } from "../utils";
 import goals from "../data/goals.json";
-// import Calendar from "../components/Calendar";
 
 const WEEKLY_GOALS = {
-  ["Run"]: 10,
   ["Walk"]: 10,
 };
 
