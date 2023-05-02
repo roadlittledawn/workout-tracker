@@ -174,6 +174,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             (item) => Object.keys(item)[0] === dateKey
           )[dateKey];
           return accum + thisWeeksGoal;
+        }
+        if (curr.goalId === "total-miles-ran" && !curr.goalVariesByWeek) {
+          return accum + curr.targetMetricNumber;
         } else {
           return accum + 0;
         }
@@ -233,9 +236,6 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         </div>
       </header>
       <h1>Dashboard</h1>
-      {/* <>
-        <Calendar startDate={"2023-1-9"} endDate={"2023-4-16"} />
-      </> */}
       {activityData && (
         <>
           <h2>Weekly goal progress</h2>
