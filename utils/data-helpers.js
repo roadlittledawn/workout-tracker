@@ -53,7 +53,7 @@ export const getThisWeeksGoal = (goalsByWeek, dateKey) => {
  */
 export const getPastWeeksGoal = (goalData, dateKey, numberOfWeeks) => {
   const weeksGoals = [];
-  if (goalData.goalVariesByWeek === true) {
+  if (goalData.goalVariesByWeek) {
     const { goalsByWeek } = goalData;
     const indexOfCurrentWeek = goalsByWeek.findIndex(
       (item) => Object.keys(item)[0] === dateKey
@@ -65,6 +65,11 @@ export const getPastWeeksGoal = (goalData, dateKey, numberOfWeeks) => {
       } else {
         weeksGoals.push(0);
       }
+    }
+  }
+  if (!goalData.goalVariesByWeek) {
+    for (var i = 0; i < numberOfWeeks; i++) {
+      weeksGoals.push(goalData.targetMetricNumber);
     }
   } else {
     for (var i = 0; i < numberOfWeeks; i++)
