@@ -210,6 +210,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             (item) => Object.keys(item)[0] === dateKey
           )[dateKey];
           return accum + thisWeeksGoal;
+        }
+        if (curr.goalId === "total-miles-ran" && !curr.goalVariesByWeek) {
+          return accum + curr.targetMetricNumber;
         } else {
           return accum + 0;
         }
