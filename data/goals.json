@@ -1,13 +1,25 @@
 [
   {
-    "sportType": "Run",
-    "goalId": "total-miles-ran",
-    "displayName": "Standard weekly running regiment",
-    "startDate": "2023-4-25",
+    "sportType": "Swim",
+    "goalId": "total-swims",
+    "displayName": "Weekly number of swims",
+    "startDate": "2024-1-01",
     "endDate": null,
-    "targetMetricName": "Total Miles Ran",
-    "targetMetrickKey": "distance",
-    "targetMetricNumber": 13,
+    "targetMetricName": "Total Swims",
+    "targetMetrickKey": "count",
+    "targetMetricNumber": 2,
+    "goalVariesByWeek": false,
+    "goalsByWeek": null
+  },
+  {
+    "sportType": "Swim",
+    "goalId": "total-moving-time",
+    "displayName": "Swim time",
+    "startDate": "2024-1-01",
+    "endDate": null,
+    "targetMetricName": "Swim time",
+    "targetMetrickKey": "moving_time",
+    "targetMetricNumber": 1522,
     "goalVariesByWeek": false,
     "goalsByWeek": null
   },
