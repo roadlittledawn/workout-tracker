@@ -126,7 +126,6 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     const numberOfSwims = previousActivityData.reduce((accum, curr) => {
       return accum + curr.numberOfSwims;
     }, 0);
-    console.log({ numberOfSwims });
     const labels = [];
     for (let i = 1; i <= numberOfSwims; i++) {
       labels.push(`Swim ${i}`);
