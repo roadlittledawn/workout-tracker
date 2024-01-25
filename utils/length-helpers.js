@@ -7,3 +7,7 @@ export const calcDistanceDifference = (
   number2,
   digitsAfterDecimal = 2
 ) => (number1 - number2).toFixed(digitsAfterDecimal);
+
+export const convertMetersToYards = (meters) => {
+  return Number((meters * 1.09361).toFixed(2));
+};
