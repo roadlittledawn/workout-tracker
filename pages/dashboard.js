@@ -410,16 +410,36 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             0
           );
 
-          setPreviousActivityData((prevState) => [
-            ...prevState,
-            {
-              order: a,
-              numberOfSwims,
-              swimTimesByDistance,
-              totalMilesWalked,
-              activities: res,
-            },
-          ]);
+          setPreviousActivityData((prevState) => {
+            const uniqueData = new Set(prevState.map((item) => item.order));
+
+            if (!uniqueData.has(a)) {
+              // If 'a' is not in the set, add the new data
+              return [
+                ...prevState,
+                {
+                  order: a,
+                  numberOfSwims,
+                  swimTimesByDistance,
+                  totalMilesWalked,
+                  activities: res,
+                },
+              ];
+            } else {
+              // If 'a' is already in the set, update the existing data
+              return prevState.map((item) =>
+                item.order === a
+                  ? {
+                      ...item,
+                      numberOfSwims,
+                      swimTimesByDistance,
+                      totalMilesWalked,
+                      activities: res,
+                    }
+                  : item
+              );
+            }
+          });
         });
       }
 
@@ -627,7 +647,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
           data={pastWeeksSwimPaceChartData}
         />
       </div>
-      <h2>Swim times over time</h2>
+      <h2>Swim times over times</h2>
       <div className={styles.chartsLineChart}>
         <Line
           datasetIdKey="previousDataSwimPace"
