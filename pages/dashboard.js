@@ -155,6 +155,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       return accum;
     }, []);
 
+    swimTimesByDistance.forEach((swimTimeForDistance) => {
+      if (swimTimeForDistance.times.length > 0) {
+        swimTimeForDistance.times.sort((a, b) => {
+          return moment(a.start_date).unix() - moment(b.start_date).unix();
+        });
+      }
+    });
+
     const datasets = swimTimesByDistance.map(({ times, distanceInYards }) => ({
       label: `${distanceInYards}yds`,
       data: times.map(({ durationSeconds }) => durationSeconds),
@@ -489,6 +497,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         }
         return accum;
       }, []);
+
+      swimTimesByDistance.forEach((swimTimeForDistance) => {
+        if (swimTimeForDistance.times.length > 0) {
+          swimTimeForDistance.times.sort((a, b) => {
+            return moment(a.start_date).unix() - moment(b.start_date).unix();
+          });
+        }
+      });
 
       setswimTimeDataByDistance(swimTimesByDistance);
 
