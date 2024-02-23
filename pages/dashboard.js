@@ -17,6 +17,7 @@ import {
 import "chartjs-adapter-moment";
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
+import generateRandomColor from "../utils/generateRandomColor";
 import "react-circular-progressbar/dist/styles.css";
 import {
   getActivityData,
@@ -72,6 +73,21 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       title: {
         display: true,
         text: "Goal progress per week per activity",
+      },
+    },
+  };
+
+  const tooltipConfig = {
+    callbacks: {
+      label: function (context) {
+        var value = context.parsed.y;
+        var hours = Math.floor(value / 3600);
+        var minutes = Math.floor((value - hours * 3600) / 60);
+        var seconds = value - hours * 3600 - minutes * 60;
+        hours = hours.toString().padStart(2, "0");
+        minutes = minutes.toString().padStart(2, "0");
+        seconds = seconds.toString().padStart(2, "0");
+        return "Time: " + hours + ":" + minutes + ":" + seconds;
       },
     },
   };
@@ -155,13 +171,24 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       return accum;
     }, []);
 
-    const datasets = swimTimesByDistance.map(({ times, distanceInYards }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(({ durationSeconds }) => durationSeconds),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
+    swimTimesByDistance.forEach((swimTimeForDistance) => {
+      if (swimTimeForDistance.times.length > 0) {
+        swimTimeForDistance.times.sort((a, b) => {
+          return moment(a.start_date).unix() - moment(b.start_date).unix();
+        });
+      }
+    });
+
+    const datasets = swimTimesByDistance.map(({ times, distanceInYards }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(({ durationSeconds }) => durationSeconds),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
@@ -179,6 +206,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     datasets: currentSwimTimesDatasets(swimTimes),
   };
 
+  const color = generateRandomColor();
+
   const currentWeekSwimPaceChartData = {
     labels: currentWeekSwimTimeLabels,
     datasets: swimTimeDataByDistance.map(({ times, distanceInYards }) => ({
@@ -186,8 +215,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       data: times.map(
         ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
       ),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
+      borderColor: color,
+      backgroundColor: color,
       tension: 0.1,
     })),
   };
@@ -234,15 +263,26 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       return accum;
     }, []);
 
-    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(
-        ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
-      ),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
+    swimTimeDataSets.forEach((swimTimeForDistance) => {
+      if (swimTimeForDistance.times.length > 0) {
+        swimTimeForDistance.times.sort((a, b) => {
+          return moment(a.start_date).unix() - moment(b.start_date).unix();
+        });
+      }
+    });
+
+    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(
+          ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
+        ),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
@@ -305,15 +345,16 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       }
     });
 
-    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(({ movingTimeSeconds }) => movingTimeSeconds),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
-
-    console.log({ datasets });
+    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(({ movingTimeSeconds }) => movingTimeSeconds),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
@@ -484,6 +525,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
         return accum;
       }, []);
 
+      swimTimesByDistance.forEach((swimTimeForDistance) => {
+        if (swimTimeForDistance.times.length > 0) {
+          swimTimeForDistance.times.sort((a, b) => {
+            return moment(a.start_date).unix() - moment(b.start_date).unix();
+          });
+        }
+      });
+
       setswimTimeDataByDistance(swimTimesByDistance);
 
       const totalMetersWalked = activityData
@@ -539,9 +588,27 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                   responsive: true,
                   scales: {
                     y: {
-                      title: { text: "seconds", display: true },
+                      title: { text: "hh:mm:ss", display: true },
                       reverse: true,
+                      ticks: {
+                        // Convert seconds to HH:MM:SS format
+                        callback: function (value, index, values) {
+                          var hours = Math.floor(value / 3600);
+                          var minutes = Math.floor((value - hours * 3600) / 60);
+                          var seconds = value - hours * 3600 - minutes * 60;
+
+                          // Add leading zeros if needed
+                          hours = hours.toString().padStart(2, "0");
+                          minutes = minutes.toString().padStart(2, "0");
+                          seconds = seconds.toString().padStart(2, "0");
+
+                          return hours + ":" + minutes + ":" + seconds;
+                        },
+                      },
                     },
+                  },
+                  plugins: {
+                    tooltip: tooltipConfig,
                   },
                 }}
                 data={currentWeekSwimTimeChartData}
@@ -555,9 +622,27 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                   responsive: true,
                   scales: {
                     y: {
-                      title: { text: "seconds", display: true },
+                      title: { text: "hh:mm:ss", display: true },
                       reverse: true,
+                      ticks: {
+                        // Convert seconds to HH:MM:SS format
+                        callback: function (value, index, values) {
+                          var hours = Math.floor(value / 3600);
+                          var minutes = Math.floor((value - hours * 3600) / 60);
+                          var seconds = value - hours * 3600 - minutes * 60;
+
+                          // Add leading zeros if needed
+                          hours = hours.toString().padStart(2, "0");
+                          minutes = minutes.toString().padStart(2, "0");
+                          seconds = seconds.toString().padStart(2, "0");
+
+                          return hours + ":" + minutes + ":" + seconds;
+                        },
+                      },
                     },
+                  },
+                  plugins: {
+                    tooltip: tooltipConfig,
                   },
                 }}
                 data={currentWeekSwimPaceChartData}
@@ -625,7 +710,32 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       <div className={styles.chartsLineChart}>
         <Line
           datasetIdKey="previousDataSwimTimes"
-          options={{ responsive: true, scales: { y: { reverse: true } } }}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                reverse: true,
+                ticks: {
+                  // Convert seconds to HH:MM:SS format
+                  callback: function (value, index, values) {
+                    var hours = Math.floor(value / 3600);
+                    var minutes = Math.floor((value - hours * 3600) / 60);
+                    var seconds = value - hours * 3600 - minutes * 60;
+
+                    // Add leading zeros if needed
+                    hours = hours.toString().padStart(2, "0");
+                    minutes = minutes.toString().padStart(2, "0");
+                    seconds = seconds.toString().padStart(2, "0");
+
+                    return hours + ":" + minutes + ":" + seconds;
+                  },
+                },
+              },
+            },
+            plugins: {
+              tooltip: tooltipConfig,
+            },
+          }}
           data={pastWeeksSwimPaceChartData}
         />
       </div>
@@ -633,7 +743,32 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       <div className={styles.chartsLineChart}>
         <Line
           datasetIdKey="previousDataSwimPace"
-          options={{ responsive: true, scales: { y: { reverse: true } } }}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                reverse: true,
+                ticks: {
+                  // Convert seconds to HH:MM:SS format
+                  callback: function (value, index, values) {
+                    var hours = Math.floor(value / 3600);
+                    var minutes = Math.floor((value - hours * 3600) / 60);
+                    var seconds = value - hours * 3600 - minutes * 60;
+
+                    // Add leading zeros if needed
+                    hours = hours.toString().padStart(2, "0");
+                    minutes = minutes.toString().padStart(2, "0");
+                    seconds = seconds.toString().padStart(2, "0");
+
+                    return hours + ":" + minutes + ":" + seconds;
+                  },
+                },
+              },
+            },
+            plugins: {
+              tooltip: tooltipConfig,
+            },
+          }}
           data={pastWeeksSwimTimeChartData}
         />
       </div>
