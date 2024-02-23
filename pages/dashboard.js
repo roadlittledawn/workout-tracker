@@ -573,8 +573,23 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                   responsive: true,
                   scales: {
                     y: {
-                      title: { text: "seconds", display: true },
+                      title: { text: "hh:mm:ss", display: true },
                       reverse: true,
+                      ticks: {
+                        // Convert seconds to HH:MM:SS format
+                        callback: function (value, index, values) {
+                          var hours = Math.floor(value / 3600);
+                          var minutes = Math.floor((value - hours * 3600) / 60);
+                          var seconds = value - hours * 3600 - minutes * 60;
+
+                          // Add leading zeros if needed
+                          hours = hours.toString().padStart(2, "0");
+                          minutes = minutes.toString().padStart(2, "0");
+                          seconds = seconds.toString().padStart(2, "0");
+
+                          return hours + ":" + minutes + ":" + seconds;
+                        },
+                      },
                     },
                   },
                 }}
@@ -589,8 +604,23 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                   responsive: true,
                   scales: {
                     y: {
-                      title: { text: "seconds", display: true },
+                      title: { text: "hh:mm:ss", display: true },
                       reverse: true,
+                      ticks: {
+                        // Convert seconds to HH:MM:SS format
+                        callback: function (value, index, values) {
+                          var hours = Math.floor(value / 3600);
+                          var minutes = Math.floor((value - hours * 3600) / 60);
+                          var seconds = value - hours * 3600 - minutes * 60;
+
+                          // Add leading zeros if needed
+                          hours = hours.toString().padStart(2, "0");
+                          minutes = minutes.toString().padStart(2, "0");
+                          seconds = seconds.toString().padStart(2, "0");
+
+                          return hours + ":" + minutes + ":" + seconds;
+                        },
+                      },
                     },
                   },
                 }}
@@ -659,7 +689,29 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       <div className={styles.chartsLineChart}>
         <Line
           datasetIdKey="previousDataSwimTimes"
-          options={{ responsive: true, scales: { y: { reverse: true } } }}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                reverse: true,
+                ticks: {
+                  // Convert seconds to HH:MM:SS format
+                  callback: function (value, index, values) {
+                    var hours = Math.floor(value / 3600);
+                    var minutes = Math.floor((value - hours * 3600) / 60);
+                    var seconds = value - hours * 3600 - minutes * 60;
+
+                    // Add leading zeros if needed
+                    hours = hours.toString().padStart(2, "0");
+                    minutes = minutes.toString().padStart(2, "0");
+                    seconds = seconds.toString().padStart(2, "0");
+
+                    return hours + ":" + minutes + ":" + seconds;
+                  },
+                },
+              },
+            },
+          }}
           data={pastWeeksSwimPaceChartData}
         />
       </div>
@@ -667,7 +719,29 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       <div className={styles.chartsLineChart}>
         <Line
           datasetIdKey="previousDataSwimPace"
-          options={{ responsive: true, scales: { y: { reverse: true } } }}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                reverse: true,
+                ticks: {
+                  // Convert seconds to HH:MM:SS format
+                  callback: function (value, index, values) {
+                    var hours = Math.floor(value / 3600);
+                    var minutes = Math.floor((value - hours * 3600) / 60);
+                    var seconds = value - hours * 3600 - minutes * 60;
+
+                    // Add leading zeros if needed
+                    hours = hours.toString().padStart(2, "0");
+                    minutes = minutes.toString().padStart(2, "0");
+                    seconds = seconds.toString().padStart(2, "0");
+
+                    return hours + ":" + minutes + ":" + seconds;
+                  },
+                },
+              },
+            },
+          }}
           data={pastWeeksSwimTimeChartData}
         />
       </div>
