@@ -234,6 +234,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       return accum;
     }, []);
 
+    swimTimeDataSets.forEach((swimTimeForDistance) => {
+      if (swimTimeForDistance.times.length > 0) {
+        swimTimeForDistance.times.sort((a, b) => {
+          return moment(a.start_date).unix() - moment(b.start_date).unix();
+        });
+      }
+    });
+
     const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => ({
       label: `${distanceInYards}yds`,
       data: times.map(
