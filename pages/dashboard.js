@@ -321,8 +321,6 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       tension: 0.1,
     }));
 
-    console.log({ datasets });
-
     return [
       ...datasets,
       {
