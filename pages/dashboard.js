@@ -77,6 +77,21 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     },
   };
 
+  const tooltipConfig = {
+    callbacks: {
+      label: function (context) {
+        var value = context.parsed.y;
+        var hours = Math.floor(value / 3600);
+        var minutes = Math.floor((value - hours * 3600) / 60);
+        var seconds = value - hours * 3600 - minutes * 60;
+        hours = hours.toString().padStart(2, "0");
+        minutes = minutes.toString().padStart(2, "0");
+        seconds = seconds.toString().padStart(2, "0");
+        return "Time: " + hours + ":" + minutes + ":" + seconds;
+      },
+    },
+  };
+
   const labels = getWeekStartAndEndDates(6, "M-D").map(
     ({ start, end }) => `${start} to ${end}`
   );
@@ -592,6 +607,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                       },
                     },
                   },
+                  plugins: {
+                    tooltip: tooltipConfig,
+                  },
                 }}
                 data={currentWeekSwimTimeChartData}
               />
@@ -622,6 +640,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                         },
                       },
                     },
+                  },
+                  plugins: {
+                    tooltip: tooltipConfig,
                   },
                 }}
                 data={currentWeekSwimPaceChartData}
@@ -711,6 +732,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                 },
               },
             },
+            plugins: {
+              tooltip: tooltipConfig,
+            },
           }}
           data={pastWeeksSwimPaceChartData}
         />
@@ -740,6 +764,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                   },
                 },
               },
+            },
+            plugins: {
+              tooltip: tooltipConfig,
             },
           }}
           data={pastWeeksSwimTimeChartData}
