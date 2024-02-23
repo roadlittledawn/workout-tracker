@@ -17,6 +17,7 @@ import {
 import "chartjs-adapter-moment";
 import LoginButton from "../components/LoginButton";
 import styles from "../styles/Dashboard.module.scss";
+import generateRandomColor from "../utils/generateRandomColor";
 import "react-circular-progressbar/dist/styles.css";
 import {
   getActivityData,
@@ -163,13 +164,16 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       }
     });
 
-    const datasets = swimTimesByDistance.map(({ times, distanceInYards }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(({ durationSeconds }) => durationSeconds),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
+    const datasets = swimTimesByDistance.map(({ times, distanceInYards }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(({ durationSeconds }) => durationSeconds),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
@@ -187,6 +191,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     datasets: currentSwimTimesDatasets(swimTimes),
   };
 
+  const color = generateRandomColor();
+
   const currentWeekSwimPaceChartData = {
     labels: currentWeekSwimTimeLabels,
     datasets: swimTimeDataByDistance.map(({ times, distanceInYards }) => ({
@@ -194,8 +200,8 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       data: times.map(
         ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
       ),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
+      borderColor: color,
+      backgroundColor: color,
       tension: 0.1,
     })),
   };
@@ -250,15 +256,18 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       }
     });
 
-    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(
-        ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
-      ),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
+    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(
+          ({ pacePer100YardsInSeconds }) => pacePer100YardsInSeconds
+        ),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
@@ -321,13 +330,16 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       }
     });
 
-    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => ({
-      label: `${distanceInYards}yds`,
-      data: times.map(({ movingTimeSeconds }) => movingTimeSeconds),
-      borderColor: "rgb( 31, 97, 141 )",
-      backgroundColor: "rgba( 31, 97, 141 )",
-      tension: 0.1,
-    }));
+    const datasets = swimTimeDataSets.map(({ distanceInYards, times }) => {
+      const color = generateRandomColor();
+      return {
+        label: `${distanceInYards}yds`,
+        data: times.map(({ movingTimeSeconds }) => movingTimeSeconds),
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.1,
+      };
+    });
 
     return [
       ...datasets,
