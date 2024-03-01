@@ -380,6 +380,26 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     datasets: pastWeeksSwimTimesChartDatasets(previousActivityData),
   };
 
+  const pastWeeksTotalDistanceSwamChartData = {
+    labels,
+    datasets: [
+      {
+        label: "Total Yards Swam",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalYardsSwam }) => totalYardsSwam),
+        borderColor: "#c70039",
+        backgroundColor: "#c70039",
+      },
+      {
+        label: "Goal",
+        data: labels.map(() => totalYardsSwamGoal),
+        borderColor: "#c700392e",
+        backgroundColor: "#c700392e",
+      },
+    ],
+  };
+
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
       const accessToken = Cookies.get("seshToken");
@@ -395,6 +415,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               return accum;
             }
           }, 0);
+
+          const totalYardsSwam = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Swim") {
+                return Number(accum + convertMetersToYards(distance));
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
 
           // Change to match shape of swimTimeDataByDistance
           const swimTimesByDistance = res
@@ -466,6 +497,7 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
                 {
                   order: a,
                   numberOfSwims,
+                  totalYardsSwam,
                   swimTimesByDistance,
                   totalMilesWalked,
                   activities: res,
@@ -820,6 +852,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             },
           }}
           data={pastWeeksSwimTimeChartData}
+        />
+      </div>
+      <h2>Total distance swam over time</h2>
+      <div className={styles.chartsLineChart}>
+        <Line
+          datasetIdKey="previousWeeksTotalSwimDistance"
+          options={{ responsive: true }}
+          data={pastWeeksTotalDistanceSwamChartData}
         />
       </div>
     </>
