@@ -24,6 +24,19 @@
     "goalsByWeek": null
   },
   {
+    "sportType": "Swim",
+    "goalId": "total-distance",
+    "displayName": "Total distance swam (yards)",
+    "startDate": "2024-1-01",
+    "endDate": null,
+    "targetMetricName": "Distance",
+    "targetMetrickKey": "distance",
+    "targetMetricNumber": 1800,
+    "units": "yards",
+    "goalVariesByWeek": false,
+    "goalsByWeek": null
+  },
+  {
     "sportType": "Walk",
     "goalId": "total-miles-walked",
     "startDate": "2023-1-9",

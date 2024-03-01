@@ -47,6 +47,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [numberOfSwims, setNumberOfSwims] = useState(0);
   const [numberOfSwimsGoal, setNumberOfSwimsGoal] = useState(0);
   const [numberOfSwimsGoalPercent, setNumberOfSwimsGoalPercent] = useState(0);
+  const [totalYardsSwamThisWeek, setTotalYardsSwamThisWeek] = useState(0);
+  const [totalYardsSwamGoal, setTotalYardsSwamGoal] = useState(0);
+  const [totalYardsSwamGoalPercent, setTotalYardsSwamGoalPercent] = useState(0);
   const [swimTimes, setSwimTimes] = useState([]);
   const [swimTimeDataByDistance, setswimTimeDataByDistance] = useState([]);
   const [milesWalked, setMilesWalked] = useState(0);
@@ -134,9 +137,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     ],
   };
 
-  const currentWeekSwimTimeLabels = swimTimes.map(
-    (_, index) => `Swim ${index + 1}`
-  );
+  const currentWeekSwimTimeLabels = () => {
+    let maxLength = 0;
+
+    swimTimeDataByDistance.forEach((obj) => {
+      if (obj.times && obj.times.length > maxLength) {
+        maxLength = obj.times.length;
+      }
+    });
+
+    return Array.from({ length: maxLength }, (_, index) => `Swim ${index + 1}`);
+  };
 
   const createSwimChartXAxisLabels = (previousActivityData) => {
     const numberOfSwims = previousActivityData.reduce((accum, curr) => {
@@ -202,14 +213,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   };
 
   const currentWeekSwimTimeChartData = {
-    labels: currentWeekSwimTimeLabels,
+    labels: currentWeekSwimTimeLabels(),
     datasets: currentSwimTimesDatasets(swimTimes),
   };
 
   const color = generateRandomColor();
 
   const currentWeekSwimPaceChartData = {
-    labels: currentWeekSwimTimeLabels,
+    labels: currentWeekSwimTimeLabels(),
     datasets: swimTimeDataByDistance.map(({ times, distanceInYards }) => ({
       label: `${distanceInYards}yds`,
       data: times.map(
@@ -377,6 +388,26 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     datasets: pastWeeksSwimTimesChartDatasets(previousActivityData),
   };
 
+  const pastWeeksTotalDistanceSwamChartData = {
+    labels,
+    datasets: [
+      {
+        label: "Total Yards Swam",
+        data: previousActivityData
+          .sort((a, b) => a.order < b.order)
+          .map(({ totalYardsSwam }) => totalYardsSwam),
+        borderColor: "#c70039",
+        backgroundColor: "#c70039",
+      },
+      {
+        label: "Goal",
+        data: labels.map(() => totalYardsSwamGoal),
+        borderColor: "#c700392e",
+        backgroundColor: "#c700392e",
+      },
+    ],
+  };
+
   useEffect(async () => {
     if (Cookies.get("seshToken")) {
       const accessToken = Cookies.get("seshToken");
@@ -392,6 +423,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               return accum;
             }
           }, 0);
+
+          const totalYardsSwam = res.reduce(
+            (accum, { sport_type, distance }) => {
+              if (sport_type === "Swim") {
+                return Number(accum + convertMetersToYards(distance));
+              } else {
+                return accum;
+              }
+            },
+            0
+          );
 
           // Change to match shape of swimTimeDataByDistance
           const swimTimesByDistance = res
@@ -453,16 +495,37 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             0
           );
 
-          setPreviousActivityData((prevState) => [
-            ...prevState,
-            {
-              order: a,
-              numberOfSwims,
-              swimTimesByDistance,
-              totalMilesWalked,
-              activities: res,
-            },
-          ]);
+          setPreviousActivityData((prevState) => {
+            const uniqueData = new Set(prevState.map((item) => item.order));
+
+            if (!uniqueData.has(a)) {
+              // If 'a' is not in the set, add the new data
+              return [
+                ...prevState,
+                {
+                  order: a,
+                  numberOfSwims,
+                  totalYardsSwam,
+                  swimTimesByDistance,
+                  totalMilesWalked,
+                  activities: res,
+                },
+              ];
+            } else {
+              // If 'a' is already in the set, update the existing data
+              return prevState.map((item) =>
+                item.order === a
+                  ? {
+                      ...item,
+                      numberOfSwims,
+                      swimTimesByDistance,
+                      totalMilesWalked,
+                      activities: res,
+                    }
+                  : item
+              );
+            }
+          });
         });
       }
 
@@ -483,6 +546,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
       ).length;
 
       setNumberOfSwims(numberOfSwims);
+
+      const totalDistanceSwamThisWeek = activityData
+        .filter(({ sport_type }) => sport_type === "Swim")
+        .reduce((accum, { distance }) => accum + distance, 0);
+
+      setTotalYardsSwamThisWeek(
+        convertMetersToYards(totalDistanceSwamThisWeek)
+      );
 
       const swimTimesThisWeek = activityData
         .filter(({ sport_type }) => sport_type === "Swim")
@@ -544,20 +615,29 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   }, [activityData]);
 
   useEffect(() => {
+    if (numberOfSwims) {
+      const percentProgressNumberOfSwims = Math.ceil(
+        (numberOfSwims / numberOfSwimsGoal) * 100
+      );
+
+      setNumberOfSwimsGoalPercent(percentProgressNumberOfSwims);
+
+      const percentProgressTotalYardsSwam = Math.ceil(
+        (totalYardsSwamThisWeek / totalYardsSwamGoal) * 100
+      );
+      setTotalYardsSwamGoalPercent(percentProgressTotalYardsSwam);
+    }
+
     const numberOfSwimsGoalObject = allGoals.find(
       (goal) => goal.goalId === "total-swims"
     );
     setNumberOfSwimsGoal(numberOfSwimsGoalObject.targetMetricNumber);
-  }, allGoals);
 
-  useEffect(() => {
-    if (numberOfSwims) {
-      const percentProgress = Math.ceil(
-        (numberOfSwims / numberOfSwimsGoal) * 100
-      );
+    const totalDistanceSwamGoalObject = allGoals.find(
+      (goal) => goal.sportType === "Swim" && goal.goalId === "total-distance"
+    );
+    setTotalYardsSwamGoal(totalDistanceSwamGoalObject.targetMetricNumber);
 
-      setNumberOfSwimsGoalPercent(percentProgress);
-    }
     if (milesWalked) {
       const percentProgress = Math.ceil(
         (milesWalked / WEEKLY_GOALS["Walk"]) * 100
@@ -656,6 +736,16 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               />
               <p>
                 {numberOfSwims} swims of {numberOfSwimsGoal} swim goal
+              </p>
+            </div>
+            <div>
+              <h3>Total Distance</h3>
+              <CircularProgressbar
+                value={totalYardsSwamGoalPercent}
+                text={`${totalYardsSwamGoalPercent}%`}
+              />
+              <p>
+                {totalYardsSwamThisWeek} yards of {totalYardsSwamGoal} goal
               </p>
             </div>
             <div>
@@ -770,6 +860,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
             },
           }}
           data={pastWeeksSwimTimeChartData}
+        />
+      </div>
+      <h2>Total distance swam over time</h2>
+      <div className={styles.chartsLineChart}>
+        <Line
+          datasetIdKey="previousWeeksTotalSwimDistance"
+          options={{ responsive: true }}
+          data={pastWeeksTotalDistanceSwamChartData}
         />
       </div>
     </>
