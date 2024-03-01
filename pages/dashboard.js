@@ -47,6 +47,9 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   const [numberOfSwims, setNumberOfSwims] = useState(0);
   const [numberOfSwimsGoal, setNumberOfSwimsGoal] = useState(0);
   const [numberOfSwimsGoalPercent, setNumberOfSwimsGoalPercent] = useState(0);
+  const [totalYardsSwamThisWeek, setTotalYardsSwamThisWeek] = useState(0);
+  const [totalYardsSwamGoal, setTotalYardsSwamGoal] = useState(0);
+  const [totalYardsSwamGoalPercent, setTotalYardsSwamGoalPercent] = useState(0);
   const [swimTimes, setSwimTimes] = useState([]);
   const [swimTimeDataByDistance, setswimTimeDataByDistance] = useState([]);
   const [milesWalked, setMilesWalked] = useState(0);
@@ -484,6 +487,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
 
       setNumberOfSwims(numberOfSwims);
 
+      const totalDistanceSwamThisWeek = activityData
+        .filter(({ sport_type }) => sport_type === "Swim")
+        .reduce((accum, { distance }) => accum + distance, 0);
+
+      setTotalYardsSwamThisWeek(
+        convertMetersToYards(totalDistanceSwamThisWeek)
+      );
+
       const swimTimesThisWeek = activityData
         .filter(({ sport_type }) => sport_type === "Swim")
         .map(({ start_date, moving_time, distance }) => {
@@ -544,20 +555,29 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   }, [activityData]);
 
   useEffect(() => {
+    if (numberOfSwims) {
+      const percentProgressNumberOfSwims = Math.ceil(
+        (numberOfSwims / numberOfSwimsGoal) * 100
+      );
+
+      setNumberOfSwimsGoalPercent(percentProgressNumberOfSwims);
+
+      const percentProgressTotalYardsSwam = Math.ceil(
+        (totalYardsSwamThisWeek / totalYardsSwamGoal) * 100
+      );
+      setTotalYardsSwamGoalPercent(percentProgressTotalYardsSwam);
+    }
+
     const numberOfSwimsGoalObject = allGoals.find(
       (goal) => goal.goalId === "total-swims"
     );
     setNumberOfSwimsGoal(numberOfSwimsGoalObject.targetMetricNumber);
-  }, allGoals);
 
-  useEffect(() => {
-    if (numberOfSwims) {
-      const percentProgress = Math.ceil(
-        (numberOfSwims / numberOfSwimsGoal) * 100
-      );
+    const totalDistanceSwamGoalObject = allGoals.find(
+      (goal) => goal.sportType === "Swim" && goal.goalId === "total-distance"
+    );
+    setTotalYardsSwamGoal(totalDistanceSwamGoalObject.targetMetricNumber);
 
-      setNumberOfSwimsGoalPercent(percentProgress);
-    }
     if (milesWalked) {
       const percentProgress = Math.ceil(
         (milesWalked / WEEKLY_GOALS["Walk"]) * 100
@@ -656,6 +676,16 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
               />
               <p>
                 {numberOfSwims} swims of {numberOfSwimsGoal} swim goal
+              </p>
+            </div>
+            <div>
+              <h3>Total Distance</h3>
+              <CircularProgressbar
+                value={totalYardsSwamGoalPercent}
+                text={`${totalYardsSwamGoalPercent}%`}
+              />
+              <p>
+                {totalYardsSwamThisWeek} yards of {totalYardsSwamGoal} goal
               </p>
             </div>
             <div>
