@@ -137,9 +137,17 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
     ],
   };
 
-  const currentWeekSwimTimeLabels = swimTimes.map(
-    (_, index) => `Swim ${index + 1}`
-  );
+  const currentWeekSwimTimeLabels = () => {
+    let maxLength = 0;
+
+    swimTimeDataByDistance.forEach((obj) => {
+      if (obj.times && obj.times.length > maxLength) {
+        maxLength = obj.times.length;
+      }
+    });
+
+    return Array.from({ length: maxLength }, (_, index) => `Swim ${index + 1}`);
+  };
 
   const createSwimChartXAxisLabels = (previousActivityData) => {
     const numberOfSwims = previousActivityData.reduce((accum, curr) => {
@@ -205,14 +213,14 @@ const DashboardPage = ({ NODE_ENV, HOSTNAME, CLIENT_ID }) => {
   };
 
   const currentWeekSwimTimeChartData = {
-    labels: currentWeekSwimTimeLabels,
+    labels: currentWeekSwimTimeLabels(),
     datasets: currentSwimTimesDatasets(swimTimes),
   };
 
   const color = generateRandomColor();
 
   const currentWeekSwimPaceChartData = {
-    labels: currentWeekSwimTimeLabels,
+    labels: currentWeekSwimTimeLabels(),
     datasets: swimTimeDataByDistance.map(({ times, distanceInYards }) => ({
       label: `${distanceInYards}yds`,
       data: times.map(
